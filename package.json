@@ -1,6 +1,6 @@
 {
   "name": "swingmobility-utils",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Swing 공통 유틸리티 함수",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
