@@ -62,12 +62,9 @@ jobs:
           # 버전 비교 및 업데이트
           if [ "$CURRENT_VERSION" = "$LOCAL_VERSION" ]; then
             echo "Version needs to be updated"
-            # 패치 버전 증가 (0.0.x)
-            npm version patch
-            
-            # 버전 업데이트된 package.json 커밋 (자동 커밋은 CI를 트리거하지 않도록 하기 위해 [skip ci] 태그 추가)
-            git add package.json package-lock.json
-            git commit -m "[자동] 버전 업데이트 v$(node -p "require('./package.json').version") [skip ci]"
+            # 패치 버전 증가 (0.0.x) - npm version은 자동으로 커밋을 생성함
+            # 자동 커밋에 [skip ci] 태그 추가
+            npm version patch -m "[자동] 버전 업데이트 v%s [skip ci]"
           fi
           
           # npm에 패키지 배포
