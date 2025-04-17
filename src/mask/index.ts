@@ -6,7 +6,7 @@
  * - 3자리: 첫 글자 + '*' + 마지막 글자
  * - 4자리 이상: 뒷 2자리를 '**'로 대체
  */
-export const maskName = (name?: string): string => {
+export const maskName = (name?: string | null): string => {
   if (!name) return '-';
   const len = name.length;
   if (len === 1) return name;
@@ -21,7 +21,7 @@ export const maskName = (name?: string): string => {
  * - "YYYYMMDD" 형식: YYYY + '**' + DD
  * - "YYYY-MM-DD" 형식: YYYY-**-DD
  */
-export const maskBirthDate = (birth?: string): string => {
+export const maskBirthDate = (birth?: string | null): string => {
   if (!birth) return '-';
   if (birth.length === 8 && /^\d{8}$/.test(birth)) {
     return `${birth.slice(0, 4)}**${birth.slice(6)}`;
@@ -43,7 +43,7 @@ export const maskBirthDate = (birth?: string): string => {
  * @returns 마스킹된 전화번호 또는 오류 패턴
  */
 export const maskPhone = (
-  phone?: string | number,
+  phone?: string | number | null,
   hasHyphen: boolean = false,
   showErrorPattern: boolean = true
 ): string => {
@@ -85,7 +85,7 @@ export const maskPhone = (
  * 규칙: 로컬 파트('@' 앞)에서 앞 2자리는 그대로, 나머지를 '*'로 대체 (도메인은 그대로)
  * 예: "example@gmail.com" → "ex*****@gmail.com"
  */
-export const maskEmail = (email?: string): string => {
+export const maskEmail = (email?: string | null): string => {
   if (!email) return '-';
   const [local, domain] = email.split('@');
   if (!domain) return email;
@@ -100,7 +100,7 @@ export const maskEmail = (email?: string): string => {
  *  - "서울특별시 구로구 구로로111길 111" → "서울특별시 구로구 ****** ***"
  *  - "경기도 용인시 용인구 용용용동 123" → "경기도 용인시 용인구 **** ***"
  */
-export const maskToSigungu = (address?: string): string => {
+export const maskToSigungu = (address?: string | null): string => {
   if (!address) return '-';
 
   const tokens = address.trim().split(/\s+/);
@@ -127,7 +127,7 @@ export const maskToSigungu = (address?: string): string => {
  * -가 빠진 경우: "1234561234567" → "123456-1******"
  * 예: "123456-1234567" → "123456-1******"
  */
-export const maskRRN = (rrn?: string): string => {
+export const maskRRN = (rrn?: string | null): string => {
   if (!rrn) return '-';
   const cleaned = rrn.replace(/\D/g, '');
   if (cleaned.length !== 13) return '-';
@@ -138,7 +138,7 @@ export const maskRRN = (rrn?: string): string => {
  * 계좌번호 마스킹 함수
  * 규칙: 첫 4자리 끝 4자리가 그대로, 나머지 가운데 자리는는 '*'로 마스킹
  */
-export const maskAccount = (account?: string): string => {
+export const maskAccount = (account?: string | null): string => {
   if (!account) return '-';
   const cleaned = account.replace(/\D/g, '');
   if (cleaned.length < 8) return '-';
