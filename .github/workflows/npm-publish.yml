@@ -64,12 +64,16 @@ jobs:
             echo "Version needs to be updated"
             # 패치 버전 증가 (0.0.x)
             npm version patch
+            
+            # 버전 업데이트된 package.json 커밋 (자동 커밋은 CI를 트리거하지 않도록 하기 위해 [skip ci] 태그 추가)
+            git add package.json package-lock.json
+            git commit -m "[자동] 버전 업데이트 v$(node -p "require('./package.json').version") [skip ci]"
           fi
           
           # npm에 패키지 배포
           npm publish
           
-          # 버전 태그 푸시
+          # 버전 태그와 패키지.json 변경사항 푸시
           git push --follow-tags
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
