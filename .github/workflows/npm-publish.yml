@@ -1,0 +1,65 @@
+name: npm 패키지 배포
+
+on:
+  # PR이 main 브랜치에 머지될 때만 실행
+  pull_request:
+    types: [closed]
+    branches: [main]
+    # 타입스크립트 파일이나 package.json이 변경될 때만 실행
+    paths:
+      - 'src/**/*.ts'
+      - 'package.json'
+  
+  # 기존 push 트리거도 유지 (PR 없이 직접 푸시하는 경우를 위한 대비)
+  push:
+    branches: [main]
+    paths:
+      - 'src/**/*.ts'
+      - 'package.json'
+
+jobs:
+  build-and-publish:
+    # PR이 머지된 경우에만 실행 (pull_request 이벤트인 경우)
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: 소스 코드 체크아웃
+        uses: actions/checkout@v3
+        with:
+          # 태그와 함께 푸시할 때 필요한 설정
+          fetch-depth: 0
+      
+      - name: Node.js 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org/'
+      
+      - name: 의존성 설치
+        run: npm ci
+      
+      - name: 빌드
+        run: npm run build
+      
+      # 테스트 코드가 없는 경우를 위한 처리
+      # - name: 테스트 실행
+      #   run: npm test
+        
+      - name: 버전 업데이트 및 배포
+        run: |
+          # Git 사용자 설정
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # 패치 버전 증가 (0.0.x)
+          npm version patch
+          
+          # npm에 패키지 배포
+          npm publish
+          
+          # 버전 태그 푸시
+          git push --follow-tags
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # GitHub 토큰도 필요 (태그 푸시 권한용)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
