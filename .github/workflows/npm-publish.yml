@@ -1,7 +1,7 @@
 name: npm 패키지 배포
 
 on:
-  # PR이 main 브랜치에 머지될 때만 실행
+  # PR이 main 브랜치에 머지될 때만 실행 (머지되었을 때만)
   pull_request:
     types: [closed]
     branches: [main]
@@ -10,7 +10,7 @@ on:
       - 'src/**/*.ts'
       - 'package.json'
   
-  # 기존 push 트리거도 유지 (PR 없이 직접 푸시하는 경우를 위한 대비)
+  # main 브랜치에만 푸시될 때 실행 (feature 브랜치에서는 실행되지 않음)
   push:
     branches: [main]
     paths:
@@ -51,8 +51,20 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           
-          # 패치 버전 증가 (0.0.x)
-          npm version patch
+          # 이미 배포된 버전 확인
+          CURRENT_VERSION=$(npm view swingmobility-utils version)
+          echo "Current published version: $CURRENT_VERSION"
+          
+          # package.json의 버전 확인
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          echo "Local version: $LOCAL_VERSION"
+          
+          # 버전 비교 및 업데이트
+          if [ "$CURRENT_VERSION" = "$LOCAL_VERSION" ]; then
+            echo "Version needs to be updated"
+            # 패치 버전 증가 (0.0.x)
+            npm version patch
+          fi
           
           # npm에 패키지 배포
           npm publish
